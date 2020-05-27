@@ -1,15 +1,12 @@
 from PIL import Image
 
-secret_message = '101101010101010110001111111'
-path_to_carrier_image = 'carrier.png'
-path_to_secret_image = 'secret_message.png'
 
 
 def encode_bits_in_carrier_image(image, message):
     message_with_len = format(len(message), '024b') + message
     image_max_capacity = (image.size[0] * image.size[1]) * 3
     if len(message_with_len) > image_max_capacity:
-        raise ValueError('Изображение-переносчик недостаточно большое для такого кол-ва информации')
+        raise ValueError('Изображение-переносчик недостаточно большое для такого количества информации')
     return change_bits(image, message_with_len)
 
 
@@ -37,16 +34,6 @@ def change_bits(image, message):
                 return image
 
 
-def transfer_image_to_bits(image):
-    result = ''
-    pixels = image.load()
-    for i in range(image.size[0]):
-        for j in range(image.size[1]):
-            r, g, b = pixels[i, j]
-            result += format(r, '08b') + format(g, '08b') + format(b, '08b')
-    return result
-
-
 def encode_string(string):
     res = ''.join(format(i, '08b') for i in bytearray(string, 'ascii'))
     res = '0' * (3 - (len(res) % 3)) + res
@@ -54,12 +41,34 @@ def encode_string(string):
 
 
 def encode():
-    carrier_image = Image.open(path_to_carrier_image).convert('RGB')
-    secret_string = 'Hello! It is test of stegonography algorithm Least Significant Bit by ' \
-                    'students Rudik Maxim and Savchenko Anton of b17-505 study group'
+    print('Введите путь до изображения в формате PNG:')
+    path_to_carrier_image = input()
+    while path_to_carrier_image.find('.png') == -1:
+        print('Неправильный формат!\nВведите путь до изображения в формате PNG:')
+        path_to_carrier_image = input()
+
+    while True:
+        try:
+            carrier_image = Image.open(path_to_carrier_image).convert('RGB')
+        except FileNotFoundError:
+            print('Файл не найден!\nВведите путь до изображения в формате PNG:')
+            path_to_carrier_image = input()
+        else:
+            break
+
+    print('Введите текст сообщения:')
+    secret_string = input()
+
     secret_message = encode_string(secret_string)
-    carrier_image = encode_bits_in_carrier_image(carrier_image, secret_message)
-    carrier_image.save('encoded_image.png')
+    try:
+        carrier_image = encode_bits_in_carrier_image(carrier_image, secret_message)
+    except ValueError as err:
+        print(err)
+        return
+
+    path_to_encoded_image = f'{path_to_carrier_image[:-4]}_encoded.png'
+    carrier_image.save(path_to_encoded_image)
+    print(f'Успешно! Изображение сохранено в {path_to_encoded_image}')
 
 
 if __name__ == "__main__":

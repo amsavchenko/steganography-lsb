@@ -1,6 +1,5 @@
 from PIL import Image
 
-path_to_encoded_image = 'encoded_image.png'
 
 
 def decode_bits_from_image(image):
@@ -36,10 +35,28 @@ def decode_string(string):
 
 
 def decode():
-    encoded_image = Image.open(path_to_encoded_image).convert("RGB")
+    print('Введите путь до изображения в формате PNG:')
+    path_to_encoded_image = input()
+    while path_to_encoded_image.find('.png') == -1:
+        print('Неправильный формат!\nВведите путь до изображения в формате PNG:')
+        path_to_encoded_image = input()
+
+    while True:
+        try:
+            encoded_image = Image.open(path_to_encoded_image).convert("RGB")
+        except FileNotFoundError:
+            print('Файл не найден!\nВведите путь до изображения в формате PNG:')
+            path_to_encoded_image = input()
+        else:
+            break
+
     secure_bits = decode_bits_from_image(encoded_image)
+    if not secure_bits:
+        print('Скрытого сообщения в файле не обнаружено. ')
+        return
+
     secure_message = decode_string(secure_bits)
-    print(secure_message)
+    print('Сообщение, которое было встроено:\n', secure_message)
 
 
 if __name__ == "__main__":
