@@ -2,7 +2,7 @@ from PIL import Image
 
 
 
-def decode_bits_from_image(image):
+def decode_bits_from_image(image: Image) -> str:
     length = ''
     for j in range(8):
         r, g, b = image.getpixel((0, j))
@@ -24,7 +24,7 @@ def decode_bits_from_image(image):
                 return secure_message
 
 
-def decode_string(string):
+def decode_string(string: str) -> str:
     if len(string) % 8 != 0:
         amount_of_nonleading_zeroes = len(string) - 8 * (len(string) // 8)
         string = string[amount_of_nonleading_zeroes:]

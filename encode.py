@@ -1,8 +1,8 @@
 from PIL import Image
 
 
-
-def encode_bits_in_carrier_image(image, message):
+def encode_bits_in_carrier_image(image: Image, message: str) -> Image:
+    '''Функция встраивает в изображение image скрытое сообшение message'''
     message_with_len = format(len(message), '024b') + message
     image_max_capacity = (image.size[0] * image.size[1]) * 3
     if len(message_with_len) > image_max_capacity:
@@ -10,7 +10,7 @@ def encode_bits_in_carrier_image(image, message):
     return change_bits(image, message_with_len)
 
 
-def change_bits(image, message):
+def change_bits(image: Image, message: str) -> Image:
     pixels = image.load()
     counter_of_encoded_bits = 0
     for i in range(image.size[0]):
@@ -34,8 +34,8 @@ def change_bits(image, message):
                 return image
 
 
-def encode_string(string):
-    res = ''.join(format(i, '08b') for i in bytearray(string, 'ascii'))
+def encode_string(string: str) -> str:
+    res = ''.join(format(i, '08b') for i in bytearray(string, 'utf-8'))
     res = '0' * (3 - (len(res) % 3)) + res
     return res
 
@@ -61,13 +61,14 @@ def encode():
 
     secret_message = encode_string(secret_string)
     try:
-        carrier_image = encode_bits_in_carrier_image(carrier_image, secret_message)
+        filled_image = encode_bits_in_carrier_image(carrier_image, secret_message)
     except ValueError as err:
         print(err)
         return
 
+
     path_to_encoded_image = f'{path_to_carrier_image[:-4]}_encoded.png'
-    carrier_image.save(path_to_encoded_image)
+    filled_image.save(path_to_encoded_image)
     print(f'Успешно! Изображение сохранено в {path_to_encoded_image}')
 
 
